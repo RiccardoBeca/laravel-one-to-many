@@ -34,6 +34,16 @@
            @enderror
         </div>
 
+        <div class="mb-3">
+          <select name="category_id" id="category">
+            @foreach ($categories as $category )
+
+              <option @if( old('category_id') == $category->id ) selected @endif value="{{ $category->id }}">{{ $category->name }}</option>
+              
+            @endforeach
+          </select>
+        </div>
+
         @foreach ($tags as $tag)
           <input type="checkbox" name="tags[]" 
           id="tag{{ $loop->iteration }}"
