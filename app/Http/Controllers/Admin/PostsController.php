@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\PostRequest;
 use Illuminate\Http\Request;
 use App\Post;
+use App\Category;
+use App\Tag;
 
 class PostsController extends Controller
 {
@@ -17,8 +19,9 @@ class PostsController extends Controller
     public function index()
     {
         $posts = Post::orderBy('id','desc')->get();
-
-        return view('admin.posts.index', compact('posts'));
+        // aggiungo categories alla index per poterlo utilizzare nella view
+        $categories = Category::all();
+        return view('admin.posts.index', compact( 'posts', 'categories' ));
 
     }
 
@@ -29,7 +32,9 @@ class PostsController extends Controller
      */
     public function create()
     {
-        return view('admin.posts.create');
+        $categories =  Category::all();
+        $tags = Tag::all();
+        return view('admin.posts.create', compact('categories', 'tags'));
     }
 
     /**
@@ -46,7 +51,11 @@ class PostsController extends Controller
         $data['slug'] = Post::generateSlug($data['title']);
         $new_post->fill($data);
         $new_post->save();
-        return redirect()->route('admin.posts.show', $new_post);
+        
+        if(array_key_exists('tags', $data)){
+            $new_post->tags()->attach($data['tags']);
+       }
+        return redirect()->route( 'admin.posts.show', $new_post );
         
 
         // dd($new_post);
@@ -60,7 +69,7 @@ class PostsController extends Controller
      */
     public function show($id)
     {      $post = Post::find($id);
-           return view('admin.posts.show', compact('post'));                 
+           return view('admin.posts.show', compact( 'post' ));                 
     }
 
     /**
@@ -72,7 +81,9 @@ class PostsController extends Controller
     public function edit($id)
     {
         $post = Post::find($id);
-        return view('admin.posts.edit',compact('post')) ;
+        $categories = Category::all();
+        $tags = Tag::all();
+        return view('admin.posts.edit',compact( 'post', 'categories', 'tags' )) ;
     }
 
     /**
@@ -86,7 +97,19 @@ class PostsController extends Controller
     {   
         $data = $request->all();
         $post->update($data);
-        return redirect()->route('admin.posts.show', $post);
+        if($data['title'] != $post->title){
+            
+            $data['slug'] = Post::generateSlug($data['title']);
+        }
+        // 
+        if(array_key_exists('tags', $data)){
+            // se esiste l'array tags lo uso per sincronizzare i dati della tabella ponte
+            $post->tags()->sync($data['tags']);
+        }else{
+            // cancello tutte le relazioni eventualmente presenti
+            $post->tags()->sync([]);
+        }
+        return redirect()->route( 'admin.posts.show', $post );
     }
 
     /**
@@ -98,6 +121,6 @@ class PostsController extends Controller
     public function destroy(Post $post)
     {
         $post->delete();
-        return redirect()->route('admin.posts.index');
+        return redirect()->route( 'admin.posts.index' );
     }
 }

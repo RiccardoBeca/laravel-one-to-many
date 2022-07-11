@@ -33,8 +33,15 @@
              <p class="text-danger">{{ $message }}</p>
            @enderror
         </div>
+
+        @foreach ($tags as $tag)
+          <input type="checkbox" name="tags[]" 
+          id="tag{{ $loop->iteration }}"
+          value="{{ $tag->id }}">
+          <label class="mr-3" for="tag{{ $loop->iteration }}">{{ $tag->name }}</label>
+        @endforeach
        
-        <button type="submit" class="btn btn-primary">Invia</button>
+        <button type="submit" class="btn btn-primary d-block">Invia</button>
       </form>
 
       

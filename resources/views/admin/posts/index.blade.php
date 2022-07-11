@@ -9,6 +9,8 @@
               <tr>
                 <th scope="col">ID</th>
                 <th scope="col">Titolo</th>
+                <th scope="col">Categoria</th>
+                <th scope="col">Tags</th>
                 <th scope="col">Actions</th>
                </tr>
             </thead>
@@ -18,6 +20,14 @@
                     <tr>
                         <th scope="row">{{ $post->id }}</th>
                         <td>{{ $post->title }}</td>
+                        <td>{{ $post->category ? $post->category->name : '-'}}</td>
+                        <td>
+                            @forelse ($post->tags as $tag)
+                                    <span class="badge badge-pill badge-warning">{{ $tag->name }}</span>
+                            @empty
+                                -
+                            @endforelse
+                        </td>
                         <td>
                             <a class="btn btn-primary" href="{{ route('admin.posts.show', $post) }}">Show</a>
                             <a class="btn btn-success" href="{{ route('admin.posts.edit', $post) }}">Edit</a>
@@ -38,6 +48,25 @@
             </tbody>
           </table>
 
+          
+          <h2 class="mb-5">I nostri Post divisi per Categoria:</h2>
+
+          {{-- @dd($categories) --}}
+            @foreach ($categories as $category )
+
+                <h3>{{ $category->name }}:</h3>
+         
+                 <ul>
+                    @forelse (  $category->posts as $post )
+                    
+                        <li>{{ $post->title }}</li>
+                    @empty
+                        <li>nessun post</li>
+                        
+                    @endforelse
+                </ul> 
+                
+            @endforeach
 
 
     </div>
