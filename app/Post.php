@@ -22,7 +22,7 @@ class Post extends Model
     }
     // relazione many to many
     public function tags(){
-        return $this->belongsToMany('App\Tag');;
+        return $this->belongsToMany('App\Tag');
     }
 
     public static function generateSlug($title){
