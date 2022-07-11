@@ -20,6 +20,10 @@ class Post extends Model
         return $this->belongsTo('App\Category');
 
     }
+    // relazione many to many
+    public function tags(){
+        return $this->belongsToMany('App\Tag');;
+    }
 
     public static function generateSlug($title){
         $slug = Str::slug($title, '-');
